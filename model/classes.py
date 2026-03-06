@@ -1,0 +1,95 @@
+from email_validator import validate_email, EmailNotValidError
+import uuid
+
+
+class Validator:
+    def validate_mail(self, email_to_check):
+        try:
+            email_info = validate_email(email_to_check, check_deliverability=False)
+            return True, email_info.normalized
+        except EmailNotValidError as e:
+            return False, str(e)
+
+
+class Customer(Validator):
+    def __init__(self, mail, tel_number, name, address, geb_date, uid):
+        self.__id = uuid.uuid4()
+        self.mail = mail
+        self.tel_number = tel_number
+        self.name = name
+        self.address = address
+        self.geb_date = geb_date
+        self.uid = uid
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def mail(self):
+        return self.__mail
+
+    @mail.setter
+    def mail(self, new_mail):
+        is_valid, normalized_email = self.validate_mail(new_mail)
+        if is_valid:
+            self.__mail = normalized_email
+        else:
+            self.__mail = new_mail
+            print(f"Warnung: {new_mail} ist ungültig.")
+
+    @property
+    def tel_number(self):
+        return self.__tel_number
+
+    @tel_number.setter
+    def tel_number(self, new_tel_number):
+        self.__tel_number = new_tel_number
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, new_name):
+        self.__name = new_name
+
+    @property
+    def address(self):
+        return self.__address
+
+    @address.setter
+    def address(self, new_address):
+        self.__address = new_address
+
+    @property
+    def geb_date(self):
+        return self.__geb_date
+
+    @geb_date.setter
+    def geb_date(self, new_geb_date):
+        self.__geb_date = new_geb_date
+
+    @property
+    def uid(self):
+        return self.__uid
+
+    @uid.setter
+    def uid(self, new_uid):
+        self.__uid = new_uid
+
+
+class Company(Customer):
+    def __init__(self, mail, tel_number, name, address, uid):
+        super().__init__(mail, tel_number, name, address, geb_date=None, uid=uid)
+
+    def validate_uid(self):
+        return bool(self.uid and len(self.uid) == 16)
+
+
+class Private(Customer):
+    def __init__(self, mail, tel_number, name, address, geb_date):
+        super().__init__(mail, tel_number, name, address, geb_date=geb_date, uid=None)
+
+    def calculate_age(self):
+        print(f"Berechne Alter für {self.name}")
