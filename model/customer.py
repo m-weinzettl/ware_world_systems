@@ -1,7 +1,7 @@
 import uuid
 from model.validator import Validator
 
-class Customer(Validator):
+class Customer():
     def __init__(self, mail, tel_number, name, address, geb_date, uid):
         self.__id = uuid.uuid4()
         self.mail = mail
@@ -23,12 +23,15 @@ class Customer(Validator):
 
     @mail.setter
     def mail(self, new_mail):
-        is_valid, normalized_email = self.validate_mail(new_mail)
+        is_valid, result = Validator.validate_mail(new_mail)
         if is_valid:
-            self.__mail = normalized_email
+            self.__mail = result
         else:
             self.__mail = new_mail
-            print(f"Warnung: {new_mail} ist ungültig.")
+            print(f"Warnung: '{new_mail}' ist keine gültige E-Mail-Adresse! (Grund: {result})")
+
+    def __str__(self):
+        return f"Customer(Name: {self.name}, E-Mail: {self.mail}, Tel: {self.tel_number})"
 
     @property
     def tel_number(self):

@@ -1,4 +1,4 @@
-from model.classes import Customer
+from model.customer import Customer
 
 class Private(Customer):
     def __init__(self, mail, tel_number, name, address, geb_date):
