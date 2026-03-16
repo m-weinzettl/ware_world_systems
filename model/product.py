@@ -1,11 +1,18 @@
 import uuid
 
+import uuid
+
+
 class Product:
-    def __init__(self, name, price, weight):
-        self.__id = uuid.uuid4()
+    def __init__(self, product_id, name, price, weight):
+        self.__id = product_id
         self.name = name
         self.price = price
         self.weight = weight
+
+    @property
+    def product_id(self):
+        return self.__id
 
 
     @property
@@ -33,8 +40,9 @@ class Product:
     def weight(self, new_weight):
         self.__weight = new_weight
 
-
-
-
     def __str__(self):
         return f"Product({self.name}, Preis: {self.price}€, Marke: {self.weight})"
+
+    @staticmethod
+    def get_load_query():
+        return "SELECT product_id, name, price, weight FROM product"

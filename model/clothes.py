@@ -1,8 +1,8 @@
 from model.product import Product
 
 class Clothes(Product):
-    def __init__(self, name, price, weight, size, color):
-        super().__init__(name, price, weight)
+    def __init__(self, product_id, name, price, weight, size, color):
+        super().__init__(product_id,name, price, weight)
         self.size = size
         self.color = color
 
@@ -24,3 +24,11 @@ class Clothes(Product):
 
     def __str__(self):
         return f"Kleidung: {self.name} | Farbe: {self.color} | Größe: {self.size} | Preis: {self.price}€"
+
+    @staticmethod
+    def get_load_query():
+        return """
+            SELECT p.product_id, p.name, p.price, p.weight, c.size, c.color 
+            FROM product p
+            JOIN clothes_product c ON p.product_id = c.product_id
+        """

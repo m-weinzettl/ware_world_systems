@@ -38,5 +38,5 @@ def run_local_route():
     except Exception as e:
         print(f"\nFehler im Prozess: {e}")
 
-if __name__ == "__main__":
-    run_local_route()
+
+

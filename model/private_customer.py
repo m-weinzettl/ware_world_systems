@@ -1,8 +1,13 @@
 from model.customer import Customer
 
 class Private_Customer(Customer):
-    def __init__(self, mail, tel_number, name, address, geb_date):
-        super().__init__(mail, tel_number, name, address, geb_date=geb_date, uid=None)
+    def __init__(self, customer_id, mail, tel_number, name, address, geb_date):
+        super().__init__(customer_id, mail, tel_number, name, address, geb_date, None)
 
-    def calculate_age(self):
-        print(f"Berechne Alter für {self.name}")
+    @staticmethod
+    def get_load_query():
+        return """
+            SELECT c.customer_id, c.mail, c.tel_number, p.name, c.address, p.geb_date
+            FROM customer c
+            JOIN private_customer p ON c.customer_id = p.customer_id
+        """
