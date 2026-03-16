@@ -1,15 +1,5 @@
-from email_validator import validate_email, EmailNotValidError
 import uuid
-
-
-class Validator:
-    def validate_mail(self, email_to_check):
-        try:
-            email_info = validate_email(email_to_check, check_deliverability=False)
-            return True, email_info.normalized
-        except EmailNotValidError as e:
-            return False, str(e)
-
+from model.validator import Validator
 
 class Customer(Validator):
     def __init__(self, mail, tel_number, name, address, geb_date, uid):
@@ -20,6 +10,8 @@ class Customer(Validator):
         self.address = address
         self.geb_date = geb_date
         self.uid = uid
+
+# Getter und Setter für Klasse Customer
 
     @property
     def id(self):
@@ -78,18 +70,3 @@ class Customer(Validator):
     def uid(self, new_uid):
         self.__uid = new_uid
 
-
-class Company(Customer):
-    def __init__(self, mail, tel_number, name, address, uid):
-        super().__init__(mail, tel_number, name, address, geb_date=None, uid=uid)
-
-    def validate_uid(self):
-        return bool(self.uid and len(self.uid) == 16)
-
-
-class Private(Customer):
-    def __init__(self, mail, tel_number, name, address, geb_date):
-        super().__init__(mail, tel_number, name, address, geb_date=geb_date, uid=None)
-
-    def calculate_age(self):
-        print(f"Berechne Alter für {self.name}")
