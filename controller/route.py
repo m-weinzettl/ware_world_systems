@@ -5,8 +5,8 @@ from database.db_manager import DB_Manager
 def run_local_route():
     db = DB_Manager()
 
-    print("--- Ware World System (Lokal) ---")
-    typ = input("Typ (P für Privat, F für Firma): ").upper()
+    print("### Ware World System (Lokal) ###")
+    typ = input("Typ des Kunden: (P für Privat, F für Firma): ").upper()
 
     # Gemeinsame Daten abfragen
     mail = input("E-Mail: ")

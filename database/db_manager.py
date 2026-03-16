@@ -1,7 +1,7 @@
 import psycopg2
 
 class DB_Manager:
-    def __init__(self):
+    def __init__(self): #db connection
         self.params = {
             "dbname": "ware_welt_db",
             "user": "postgres",
