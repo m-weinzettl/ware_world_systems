@@ -1,7 +1,3 @@
-import uuid
-
-import uuid
-
 
 class Product:
     def __init__(self, product_id, name, price, weight):
@@ -13,7 +9,6 @@ class Product:
     @property
     def product_id(self):
         return self.__id
-
 
     @property
     def id(self):
