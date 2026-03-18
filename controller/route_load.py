@@ -1,4 +1,7 @@
 import json
+import os
+from datetime import datetime
+from os import mkdir
 
 from database.db_manager import DB_Manager
 from model.customer.private_customer import Private_Customer
@@ -17,6 +20,8 @@ def run_local_route():
                                          "Test Mensch",
                                          "strasse 2 / 8430 Leibnitz",
                                          "2026-12-21")
+    file_path_bills = "bills/"
+    os.makedirs(file_path_bills, exist_ok=True)
 
     all_books = db.load_entities(Book)
     all_clothes = db.load_entities(Clothes)
@@ -35,6 +40,7 @@ def run_local_route():
     search_items.extend(db.search_entities(Electronic, "p.name", "iPad Pro"))
 
     new_cart = Shopping_Cart(current_customer)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
 
     for item in search_items:
         new_cart.add_item(item)
@@ -47,7 +53,7 @@ def run_local_route():
         #pdf generate
         invoice_data = json.loads(new_cart.generate_invoice_data())
         pdf_generate = Invoice_To_PDF()
-        pdf_generate.create_invoice_to_pdf(invoice_data, f"Rechnung_{current_customer.name.replace(' ', '_')}.pdf")
+        pdf_generate.create_invoice_to_pdf(invoice_data, f"{file_path_bills}Rechnung_{current_customer.name.replace(' ', '_')}_{timestamp}.pdf")
     else:
         print("Warenkorb leer. Suche verfeinern!")
 
