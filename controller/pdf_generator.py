@@ -1,4 +1,5 @@
 from fpdf import FPDF
+from datetime import datetime
 
 
 class Invoice_To_PDF(FPDF):
@@ -9,6 +10,8 @@ class Invoice_To_PDF(FPDF):
     def header(self):
         logo_path = "../model/logo/logo.jpg"
         site_name = "Waren Welt Online Shop"
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         try:
             self.image(logo_path, 167, 8, 33)
         except:
@@ -41,6 +44,8 @@ class Invoice_To_PDF(FPDF):
         self.set_font('Helvetica', 'B', 8)
         oid = self.invoice_data.get('order_id', 'N/A')
         self.cell(90, 5, f"Bestell-ID: {str(oid)}", 0, 1, 'R')
+        self.set_font('Helvetica', '', 8)
+        self.cell(0, 5, f"Erstellt am: {timestamp}", 0, 1, 'R')
 
         self.set_xy(10, 55)
         self.ln(5)
@@ -62,8 +67,6 @@ class Invoice_To_PDF(FPDF):
         for item in self.invoice_data["items"]:
             start_y = self.get_y()
 
-            self.rect(10, start_y, 130, 14)  # Rahmen für die linke Zelle
-
             self.set_font('Helvetica', 'B', 10)
             self.set_xy(12, start_y + 2)
             self.cell(126, 5, item['name'], 0, 1, 'L')
@@ -77,6 +80,8 @@ class Invoice_To_PDF(FPDF):
             self.set_text_color(0, 0, 0)
             end_y = self.get_y() + 2
             h = max(14, end_y - start_y)
+
+            self.rect(10, start_y, 130, h)
 
             self.set_xy(140, start_y)
             self.set_font('Helvetica', '', 10)
