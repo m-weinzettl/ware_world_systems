@@ -1,4 +1,5 @@
 import psycopg2
+from model.shopping_cart.shopping_cart import Shopping_Cart
 
 class DB_Manager:
     def __init__(self):
@@ -43,3 +44,25 @@ class DB_Manager:
         except psycopg2.Error as e:
             print(f"Fehler bei der Suche: {e}!")
             return []
+
+    def save_order(self, cart: Shopping_Cart):
+        try:
+            with psycopg2.connect(**self.params) as conn:
+                with conn.cursor() as cursor:
+                    query = cart.save_invoice_query()
+                    data = (
+                        str(cart.customer.customer_id),
+                        cart.get_total_price(),
+                        cart.generate_invoice_data(),
+                        cart.is_company
+                    )
+                    cursor.execute(query, data)
+
+                    cursor.execute(
+                        "DELETE FROM shopping_cart WHERE customer_id = %s",
+                        (str(cart.customer.customer_id),)
+                    )
+                    conn.commit()
+                    print("Bestellung erfolgreich archiviert und Warenkorb geleert!")
+        except psycopg2.Error as e:
+            print(f"Fehler beim Speichern der Order: {e}!")
