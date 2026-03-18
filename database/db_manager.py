@@ -1,6 +1,5 @@
 import psycopg2
 
-
 class DB_Manager:
     def __init__(self):
         self.params = {

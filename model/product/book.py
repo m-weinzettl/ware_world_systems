@@ -1,4 +1,4 @@
-from model.product import Product
+from model.product.product import Product
 
 
 class Book(Product):

@@ -1,4 +1,4 @@
-from model.customer import Customer
+from model.customer.customer import Customer
 
 
 class Company_Customer(Customer):

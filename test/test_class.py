@@ -1,4 +1,4 @@
-from model.private_customer import Private_Customer
+from model.customer.private_customer import Private_Customer
 
 
 create_test_customer_private_1 = Private_Customer(mail = "hans@test.at", tel_number="06641414253", name="Hans Wurst",

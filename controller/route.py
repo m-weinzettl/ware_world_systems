@@ -1,5 +1,5 @@
-from model.private_customer import Private_Customer
-from model.company_customer import Company_Customer
+from model.customer.private_customer import Private_Customer
+from model.customer.company_customer import Company_Customer
 from database.db_manager import DB_Manager
 
 def run_local_route():

@@ -1,10 +1,8 @@
 
 from database.db_manager import DB_Manager
-from database.queries import load_all_books
-from model.product import Product
-from model.book import Book
-from model.clothes import Clothes
-from model.electronic import Electronic
+from model.product.product import Book
+from model.product.product import Clothes
+from model.product.product import Electronic
 
 def run_local_route():
     db = DB_Manager()
@@ -25,5 +23,6 @@ def run_local_route():
     search_for_electronic_brand = db.search_entities(Electronic, "e.brand", "Apple")
 
     print(search_for_electronic_brand, seach_for_book_autor, seach_for_book_title)
+
 if __name__ == "__main__":
     run_local_route()
