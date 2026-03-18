@@ -1,23 +1,19 @@
-#firma oder private
-#gesuchte items
-#generiere cart_item
 import json
 
 class Shopping_Cart:
     def __init__(self, customer, items=None):
         self.__customer = customer
         self.__items = items if items is not None else []
-        self.is_company = hasattr(customer, 'uid')
-        self.is_private_customer = hasattr(customer, 'geb_date')
+        self.is_company = hasattr(customer, 'uid') and customer.uid is not None
+        self.is_private_customer = hasattr(customer, 'geb_date') and customer.geb_date is not None
 
     @property
     def customer(self):
         return self.__customer
+
     @property
     def items(self):
         return self.__items
-
-
 
     def add_item(self, product):
         self.__items.append(product)
@@ -25,26 +21,23 @@ class Shopping_Cart:
     def get_total_price(self):
         return sum(item.price for item in self.__items)
 
-
-
     def generate_invoice_data(self):
-
-        safe_name = getattr(self.__customer, "company_name", getattr(self.__customer, "name", "Unbekannt"))
         invoice = {
-
-            "customer_info":
-                {
-                    "name": safe_name,
-                    "address": self.__customer.address,
-                    "type": "customer" if self.is_company else "private",
-
-                },
+            "customer_info": {
+                "type": "customer" if self.is_company else "private",
+                "name": getattr(self.__customer, "name", None),
+                "company_name": getattr(self.__customer, "company_name", None),
+                "address": self.__customer.address,
+                "mail": self.__customer.mail,
+                "uid": getattr(self.__customer, "uid", None),
+                "geb_date": str(getattr(self.__customer, "geb_date", "")) if self.is_private_customer else None
+            },
             "items": [
                 {
                     "id": str(item.product_id),
                     "name": item.name,
                     "unit_price": float(item.price),
-                    "details": str(item)
+                    "details": str(item).replace("€", "EUR")
                 } for item in self.__items
             ],
             "total_sum": float(self.get_total_price())
@@ -55,5 +48,5 @@ class Shopping_Cart:
     def save_invoice_query():
         return """
         INSERT INTO orders (customer_id, total_price, invoice_data, is_company_order)
-        VALUES (%s, %s, %s, %s)
-    """
+        VALUES (%s, %s, %s, %s) RETURNING order_id
+        """
