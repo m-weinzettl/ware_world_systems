@@ -50,8 +50,8 @@ def run_local_route():
 
         #pdf generate
         invoice_data = json.loads(new_cart.generate_invoice_data())
-        pdf_generate = Invoice_To_PDF()
-        pdf_generate.create_invoice_to_pdf(invoice_data, f"{file_path_bills}Rechnung_{current_customer.name.replace(' ', '_')}_{timestamp}.pdf")
+        pdf_generate = Invoice_To_PDF(invoice_data)
+        pdf_generate.create_invoice_to_pdf(f"{file_path_bills}Rechnung_{current_customer.name.replace(' ', '_')}_{timestamp}.pdf")
     else:
         print("Warenkorb leer. Suche verfeinern!")
 

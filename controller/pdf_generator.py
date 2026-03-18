@@ -2,35 +2,56 @@ from fpdf import FPDF
 
 
 class Invoice_To_PDF(FPDF):
-    def create_invoice_to_pdf(self, data, file_name):
-        self.add_page()
-        self.set_font('Arial', 'B', size=15)
+    def __init__(self, data):
+        super().__init__()
+        self.invoice_data = data
 
-        #kundendaten
-        customer = data["customer_info"]
-        self.cell(0, 10, f"Rechnung für {customer['name']}", ln=True)
-        self.set_font('Arial', '', size=12)
-        self.cell(0, 10, f"Typ: {customer['type']}", ln=True)
+
+
+    def header(self):
+        logo_path = "../model/logo/logo.jpg"
+        # Logo oder der Titel oben auf JEDER Seite
+        self.image(logo_path, 10, 8, 33)
+        self.set_font('Helvetica', 'B', 15)
+        customer = self.invoice_data["customer_info"]
+        self.cell(0, 10, f"Rechnung für {customer['name']}", 0, 1, 'C')
+        self.set_font('Helvetica', 'I', 10)
+        self.cell(0, 5, f"Kunden-Typ: {customer['type']}", 0, 1, 'C')
         self.ln(10)
 
-        self.set_font('Arial', 'B', size=12)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Helvetica', 'I', 8)
+        self.cell(0, 10, f'Seite {self.page_no()} / {{nb}}', 0, 0, 'C')
+
+    def create_invoice_to_pdf(self, file_name):
+        self.alias_nb_pages()
+        self.add_page()
+
+        # Tabellenkopf
+        self.set_font('Helvetica', 'B', 12)
         self.cell(130, 10, "Produkt / Details", 1)
-        self.cell(60, 10, "Preis", 1, ln=True)
+        self.cell(60, 10, "Preis", 1, ln=True, align='C')
 
         # Items durchlaufen
-        self.set_font('Arial', '', size=11)
-        for item in data["items"]:
+        self.set_font('Helvetica', '', 11)
+        for item in self.invoice_data["items"]:
             start_y = self.get_y()
-            self_details = item['details'].replace("€", "EUR")
-            self.multi_cell(130, 8, f"{item['name']}\n{self_details}", 1)
+
+            safe_details = item['details'].replace("€", "EUR")
+
+            # Multi-Cell für den Text
+            self.multi_cell(130, 8, f"{item['name']}\n{safe_details}", 1)
             end_y = self.get_y()
 
-            self.set_xy(140, start_y)
-            self.cell(60, end_y - start_y, f"{item['unit_price']:.2f} EUR", 1, ln=True)
+            # Preis-Zelle
+            self.set_xy(10 + 130, start_y)
+            self.cell(60, end_y - start_y, f"{item['unit_price']:.2f} EUR", 1, ln=True, align='R')
 
+        # Gesamtsumme
         self.ln(10)
-        self.set_font('Arial', 'B', size=12)
-        self.cell(0, 10, f"Gesamtpreis: {data['total_sum']:.2f} EUR", 1, ln=True)
+        self.set_font('Helvetica', 'B', 12)
+        self.cell(130, 10, "Gesamtpreis:", 0, align='R')
+        self.cell(60, 10, f"{self.invoice_data['total_sum']:.2f} EUR", 1, ln=True, align='R')
 
-        # Speichern
         self.output(file_name)
