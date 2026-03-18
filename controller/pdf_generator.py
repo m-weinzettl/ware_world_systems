@@ -1,5 +1,6 @@
 from fpdf import FPDF
 
+
 class Invoice_To_PDF(FPDF):
     def __init__(self, data):
         super().__init__()
@@ -7,6 +8,7 @@ class Invoice_To_PDF(FPDF):
 
     def header(self):
         logo_path = "../model/logo/logo.jpg"
+        site_name = "Waren Welt Online Shop"
         try:
             self.image(logo_path, 167, 8, 33)
         except:
@@ -16,10 +18,10 @@ class Invoice_To_PDF(FPDF):
         display_header = customer.get('company_name') or customer.get('name') or "Kunde"
 
         self.set_font('Helvetica', 'B', 15)
+        self.cell(0, 10, f"{site_name}", 0, 1, 'L')
         self.cell(0, 10, f"Rechnung für {display_header}", 0, 1, 'L')
 
         self.set_font('Helvetica', '', 10)
-
         if customer.get('company_name'):
             self.cell(0, 5, f"Firma: {customer['company_name']}", 0, 1, 'L')
 
@@ -57,17 +59,29 @@ class Invoice_To_PDF(FPDF):
         self.cell(130, 10, " Produkt / Details", 1, 0, 'L', fill=True)
         self.cell(60, 10, "Preis ", 1, 1, 'C', fill=True)
 
-        self.set_font('Helvetica', '', 10)
         for item in self.invoice_data["items"]:
             start_y = self.get_y()
-            safe_details = item['details'].replace("€", "EUR")
 
-            self.multi_cell(130, 7, f"{item['name']}\n{safe_details}", 1)
-            end_y = self.get_y()
-            h = end_y - start_y
+            self.rect(10, start_y, 130, 14)  # Rahmen für die linke Zelle
+
+            self.set_font('Helvetica', 'B', 10)
+            self.set_xy(12, start_y + 2)
+            self.cell(126, 5, item['name'], 0, 1, 'L')
+
+            self.set_font('Helvetica', '', 8)
+            self.set_text_color(100, 100, 100)
+            safe_details = item['details'].replace("€", "EUR")
+            self.set_x(12)
+            self.multi_cell(126, 4, safe_details, 0, 'L')
+
+            self.set_text_color(0, 0, 0)
+            end_y = self.get_y() + 2
+            h = max(14, end_y - start_y)
 
             self.set_xy(140, start_y)
+            self.set_font('Helvetica', '', 10)
             self.cell(60, h, f"{item['unit_price']:.2f} EUR", 1, 1, 'R')
+            self.set_y(start_y + h)
 
         self.ln(5)
         self.set_font('Helvetica', 'B', 12)

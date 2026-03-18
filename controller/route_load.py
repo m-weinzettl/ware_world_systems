@@ -4,7 +4,7 @@ from datetime import datetime
 from database.db_manager import DB_Manager
 from model.customer.private_customer import Private_Customer
 from model.product.book import Book
-# from model.product.clothes import Clothes
+from model.product.clothes import Clothes
 from model.product.electronic import Electronic
 from model.shopping_cart.shopping_cart import Shopping_Cart
 from controller.pdf_generator import Invoice_To_PDF
@@ -41,7 +41,7 @@ def run_local_route():
             invoice_data = db.get_invoice_data(new_order_id)
 
             pdf_generate = Invoice_To_PDF(invoice_data)
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             file_name = f"{file_path_bills}Rechnung_{current_customer.name.replace(' ', '_')}_{timestamp}.pdf"
 
             pdf_generate.create_invoice_to_pdf(file_name)
