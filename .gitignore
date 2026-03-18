@@ -1,0 +1,16 @@
+# Python-Umgebung (das wichtigste!)
+venv/
+.venv/
+env/
+
+# Python Cache (verhindert __pycache__ Ordner im Git)
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE-Einstellungen (PyCharm / VS Code)
+.idea/
+.vscode/
+
+# Rechnungen (Falls du deine privaten PDFs nicht auf GitHub haben willst)
+bills/
