@@ -1,8 +1,6 @@
 import json
 import os
 from datetime import datetime
-from os import mkdir
-
 from database.db_manager import DB_Manager
 from model.customer.private_customer import Private_Customer
 from model.product.book import Book
@@ -20,7 +18,7 @@ def run_local_route():
                                          "Test Mensch",
                                          "strasse 2 / 8430 Leibnitz",
                                          "2026-12-21")
-    file_path_bills = "bills/"
+    file_path_bills = "../bills/"
     os.makedirs(file_path_bills, exist_ok=True)
 
     all_books = db.load_entities(Book)
