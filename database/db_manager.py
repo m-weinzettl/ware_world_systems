@@ -49,7 +49,6 @@ class DB_Manager:
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    # RETURNING order_id ist bereits in cart.save_invoice_query() enthalten
                     query = cart.save_invoice_query()
                     data = (
                         str(cart.customer.id),
@@ -62,7 +61,7 @@ class DB_Manager:
                     # ID aus dem RETURNING-Statement abrufen
                     result = cursor.fetchone()
                     new_order_id = result[0] if result else None
-
+                    # cart nach Kauf löschen
                     cursor.execute(
                         "DELETE FROM shopping_cart WHERE customer_id = %s",
                         (str(cart.customer.id),)
