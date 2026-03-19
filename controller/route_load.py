@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime
 from database.db_manager import DB_Manager
@@ -33,10 +32,12 @@ def run_local_route():
 
     if len(new_cart.items) > 0:
         new_order_id = db.save_order(new_cart)
+        final_price, discount_sum = new_cart.get_total_price()
 
         if new_order_id:
             print(f"\nBestellung für {current_customer.name} gespeichert!")
-            print(f"Gesamtpreis: {new_cart.get_total_price():.2f} EUR")
+            print(f"Gesamtpreis (inkl. 5% Rabatt): {final_price:.2f} EUR")
+            print(f"Du hast {discount_sum:.2f} EUR gespart!")
 
             invoice_data = db.get_invoice_data(new_order_id)
 

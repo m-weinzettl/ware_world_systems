@@ -7,7 +7,7 @@ class DB_Manager:
         self.params = {
             "dbname": "ware_welt_db",
             "user": "postgres",
-            "password": "your_password",
+            "password": "",
             "host": "localhost"
         }
 
@@ -45,6 +45,7 @@ class DB_Manager:
             return []
 
     def save_order(self, cart: Shopping_Cart):
+        final_price, _ = cart.get_total_price()
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
@@ -52,7 +53,7 @@ class DB_Manager:
                     query = cart.save_invoice_query()
                     data = (
                         str(cart.customer.id),
-                        cart.get_total_price(),
+                        final_price,
                         cart.generate_invoice_data(),
                         cart.is_company
                     )

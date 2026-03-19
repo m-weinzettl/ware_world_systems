@@ -14,7 +14,7 @@ class Invoice_To_PDF(FPDF):
 
         try:
             self.image(logo_path, 167, 8, 33)
-        except:
+        except (FileNotFoundError, RuntimeError):
             pass
 
         customer = self.invoice_data["customer_info"]
@@ -79,7 +79,7 @@ class Invoice_To_PDF(FPDF):
 
             self.set_text_color(0, 0, 0)
             end_y = self.get_y() + 2
-            h = max(14, end_y - start_y)
+            h = max(14.0, float(end_y - start_y))
 
             self.rect(10, start_y, 130, h)
 
@@ -89,6 +89,19 @@ class Invoice_To_PDF(FPDF):
             self.set_y(start_y + h)
 
         self.ln(5)
+
+        # Berechnung der Zwischensumme (vor Rabatt)
+        subtotal = self.invoice_data['total_sum'] + self.invoice_data['discount_sum']
+
+        self.set_font('Helvetica', '', 11)
+        self.cell(130, 8, "Zwischensumme:", 0, 0, 'R')
+        self.cell(60, 8, f"{subtotal:.2f} EUR", 1, 1, 'R')
+
+        self.set_text_color(200, 0, 0)  # Rabatt in Rot
+        self.cell(130, 8, "Rabatt (5%):", 0, 0, 'R')
+        self.cell(60, 8, f"- {self.invoice_data['discount_sum']:.2f} EUR", 1, 1, 'R')
+
+        self.set_text_color(0, 0, 0)
         self.set_font('Helvetica', 'B', 12)
         self.cell(130, 10, "Gesamtpreis:", 0, 0, 'R')
         self.cell(60, 10, f"{self.invoice_data['total_sum']:.2f} EUR", 1, 1, 'R')

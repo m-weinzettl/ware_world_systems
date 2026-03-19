@@ -19,9 +19,14 @@ class Shopping_Cart:
         self.__items.append(product)
 
     def get_total_price(self):
-        return sum(item.price for item in self.__items)
+        total_price = sum(float(item.price) for item in self.__items)
+        total_price_off = total_price * 0.95
+        total_price_dif = total_price - total_price_off
+        return float(total_price_off), float(total_price_dif)
 
     def generate_invoice_data(self):
+        final_price, discount_sum = self.get_total_price()
+
         invoice = {
             "customer_info": {
                 "type": "customer" if self.is_company else "private",
@@ -40,7 +45,8 @@ class Shopping_Cart:
                     "details": str(item).replace("€", "EUR")
                 } for item in self.__items
             ],
-            "total_sum": float(self.get_total_price())
+            "total_sum": float(final_price),
+            "discount_sum": float(discount_sum)
         }
         return json.dumps(invoice)
 
