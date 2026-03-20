@@ -5,12 +5,13 @@ from model.shopping_cart.shopping_cart import Shopping_Cart
 class DB_Manager:
     def __init__(self):
         self.params = {
-            "dbname": "ware_welt_db",
-            "user": "postgres",
-            "password": "",
-            "host": "localhost"
+            "dbname": "neondb",
+            "user": "neondb_owner",
+            "password": "npg_7cGaDp0ToQCt",
+            "host": "ep-falling-glitter-ant3xu4o-pooler.c-6.us-east-1.aws.neon.tech",
+            "port": "443",
+            "sslmode": "require"
         }
-
     def save_entity(self, entity):
         try:
             with psycopg2.connect(**self.params) as conn:
@@ -30,6 +31,7 @@ class DB_Manager:
                     return [entity_class(*row) for row in rows]
         except psycopg2.Error as e:
             print(f"Fehler beim Laden: {e}!")
+            return []
 
     def search_entities(self, entity_class, column, search_term):
         try:
