@@ -1,4 +1,17 @@
-Bestellung:
-    Dauerhafte Speicherung aller Bestellinformationen in einer Rechnung
-    Korrekte Übernahme der Warenkorbdaten
-    Automatische Anwendung des 5%-Rabatts für Firmenkunden
+frontend:
+    Login
+    Produkt Filter nach Kategorie
+    Warenkorb
+    Rechnung anzeigen / per Mail senden
+
+Backend:
+    User Profil
+    Login Logik
+
+Datenbank:
+    Login table hash
+    Datenbank evtl in neon auslagern
+    Sourcecode in Render laden
+
+
+Projekt evtl. auf live system umbauen
