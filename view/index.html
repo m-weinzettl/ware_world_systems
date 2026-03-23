@@ -27,10 +27,10 @@
                     {% if session['user_name'] %}
                         <span class="navbar-text me-3 text-white">Willkommen, <strong>{{ session['user_name'] }}</strong></span>
                         <a class="nav-link" href="/cart">🛒 Warenkorb</a>
-                        <a class="btn btn-outline-danger btn-sm ms-2" href="/logout">Logout</a>
+                        <a class="btn btn-outline-danger btn-sm ms-2" href="{{ url_for('user.logout') }}">Logout</a>
                     {% else %}
-                        <a class="nav-link" href="/login">Login</a>
-                        <a class="btn btn-primary btn-sm ms-2" href="/register">Registrieren</a>
+                        <a class="nav-link" href="{{ url_for('user.login') }}">Login</a>
+                        <a class="btn btn-primary btn-sm ms-2" href="{{ url_for('user.register') }}">Registrieren</a>
                     {% endif %}
                 </div>
             </div>
@@ -43,11 +43,11 @@
             <p class="text-muted">Wählen Sie eine Kategorie zum Stöbern</p>
 
             <div class="btn-group shadow-sm" role="group" aria-label="Kategorie Filter">
-                <a href="{{ url_for('index', cat='books') }}"
+                <a href="{{ url_for('product.index', cat='books') }}"
                    class="btn btn-outline-dark {{ 'active' if category == 'books' or not category }}">📚 Bücher</a>
-                <a href="{{ url_for('index', cat='electronic') }}"
+                <a href="{{ url_for('product.index', cat='electronic') }}"
                    class="btn btn-outline-dark {{ 'active' if category == 'electronic' }}">🔌 Elektronik</a>
-                <a href="{{ url_for('index', cat='clothes') }}"
+                <a href="{{ url_for('product.index', cat='clothes') }}"
                    class="btn btn-outline-dark {{ 'active' if category == 'clothes' }}">👕 Kleidung</a>
             </div>
         </div>
