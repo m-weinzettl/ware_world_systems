@@ -9,8 +9,10 @@ class DB_Manager:
             "user": "neondb_owner",
             "password": "npg_7cGaDp0ToQCt",
             "host": "ep-falling-glitter-ant3xu4o-pooler.c-6.us-east-1.aws.neon.tech",
-            "port": "443",
-            "sslmode": "require"
+            "port": 443,
+            "sslmode": "require",
+            # Das hier ist der Trick für Neon über Port 443:
+            "options": "-c project=small-mouse-86254129"
         }
     def save_entity(self, entity):
         try:
@@ -28,6 +30,7 @@ class DB_Manager:
                 with conn.cursor() as cursor:
                     cursor.execute(entity_class.get_load_query())
                     rows = cursor.fetchall()
+                    print(f"DEBUG: {len(rows)} Zeilen gefunden")
                     return [entity_class(*row) for row in rows]
         except psycopg2.Error as e:
             print(f"Fehler beim Laden: {e}!")
