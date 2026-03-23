@@ -9,10 +9,8 @@ class DB_Manager:
             "user": "neondb_owner",
             "password": "npg_7cGaDp0ToQCt",
             "host": "ep-falling-glitter-ant3xu4o-pooler.c-6.us-east-1.aws.neon.tech",
-            "port": 443,
-            "sslmode": "require",
-            # Das hier ist der Trick für Neon über Port 443:
-            "options": "-c project=small-mouse-86254129"
+            "port": 5432,  # Wieder zurück auf den Standard!
+            "sslmode": "require"
         }
     def save_entity(self, entity):
         try:
