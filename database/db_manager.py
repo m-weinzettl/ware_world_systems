@@ -92,16 +92,42 @@ class DB_Manager:
             print(f"Fehler beim Laden der Rechnungsdaten: {e}")
             return None
 
-    def check_login(self, email, password):
-        query = "SELECT id, name, email FROM customer WHERE email = %s AND password = %s"
+    def check_login(self, mail, password):
+        # Wir holen uns alle Basis-Daten, um das Objekt korrekt zu befüllen
+        query = """
+            SELECT c.customer_id, c.mail, c.tel_number, c.address, 
+                   p.name, p.geb_date, 
+                   co.company_name, co.uid_number
+            FROM public.customer c
+            LEFT JOIN public.private_customer p ON c.customer_id = p.customer_id
+            LEFT JOIN public.company_customer co ON c.customer_id = co.customer_id
+            WHERE c.mail = %s AND c.password = %s
+        """
+
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(query, (email, password))
+                    # FIX: Hier stand vorher 'email' statt 'mail'
+                    cursor.execute(query, (mail, password))
                     row = cursor.fetchone()
                     if row:
                         from model.customer.customer import Customer
-                        return Customer(*row)
+
+                        # Mapping der DB-Zeile auf deine Customer-Klasse:
+                        # row[0]=id, row[1]=mail, row[2]=tel, row[3]=address
+                        # row[4]=name (p), row[5]=geb_date, row[6]=name (co), row[7]=uid
+
+                        display_name = row[4] if row[4] else row[6]  # Privatname oder Firmenname
+
+                        return Customer(
+                            customer_id=row[0],
+                            mail=row[1],
+                            tel_number=row[2],
+                            name=display_name,
+                            address=row[3],
+                            geb_date=row[5],
+                            uid=row[7]
+                        )
                     return None
         except psycopg2.Error as e:
             print(f"Login-Fehler: {e}")
