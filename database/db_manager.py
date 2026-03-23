@@ -12,11 +12,11 @@ class DB_Manager:
             "port": 5432,
             "sslmode": "require"
         }
-    def save_entity(self, entity):
+    def save_entity(self, entity, password=None): # password als optionaler Parameter
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    for query, data in entity.get_save_queries():
+                    for query, data in entity.get_save_queries(password):
                         cursor.execute(query, data)
                     conn.commit()
         except psycopg2.Error as e:

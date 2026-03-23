@@ -22,14 +22,14 @@ def index(cat=None):
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        email_from_form = request.form.get('email')
+        password_from_form = request.form.get('password')
 
         db = DB_Manager()
-        user = db.check_login(email, password)
+        user = db.check_login(email_from_form, password_from_form)
 
         if user:
-            session["user_id"] = user.id
+            session["user_id"] = str(user.id)
             session["user_name"] = user.name
             return redirect(url_for("index"))
 
@@ -42,14 +42,21 @@ def login():
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
-        email = request.form.get('email')
+        mail = request.form.get('email')
         password = request.form.get('password')
+        # Falls Geburtsdatum oder Adresse im Formular, hier holen:
+        tel = request.form.get('tel', '')
+        addr = request.form.get('address', '')
+        geb = request.form.get('geb_date', None)
 
         from model.customer.customer import Customer
-        new_customer = Customer(None, name, email, password)
+        # WICHTIG: Alle 7 Parameter übergeben (id, mail, tel, name, addr, geb, uid)
+        new_customer = Customer(None, mail, tel, name, addr, geb, None)
 
         db = DB_Manager()
-        db.save_entity(new_customer)
+        # Password muss separat an save_entity übergeben werden,
+        # da es nicht im Customer-Objekt gespeichert wird (laut Logik)
+        db.save_entity(new_customer, password)
 
         return redirect(url_for('login'))
 
