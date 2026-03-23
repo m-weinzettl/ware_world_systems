@@ -107,7 +107,6 @@ class DB_Manager:
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    # FIX: Hier stand vorher 'email' statt 'mail'
                     cursor.execute(query, (mail, password))
                     row = cursor.fetchone()
                     if row:

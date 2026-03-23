@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from database.db_manager import DB_Manager
 from model.product.book import Book
+from model.product.clothes import Clothes
+from model.product.electronic import Electronic
 
 app = Flask(__name__, template_folder='.')
 app.secret_key = 'ein_ganz_geheimer_schluessel'
@@ -11,12 +13,19 @@ app.secret_key = 'ein_ganz_geheimer_schluessel'
 def index(cat=None):
     db = DB_Manager()
 
-    if cat == "books":
-        products = db.load_entities(Book)
-    else:
-        products = db.load_entities(Book)
+    current_cat = cat if cat else "books"
 
-    return render_template("index.html", products=products, category=cat)
+    category_map = {
+        "books": Book,
+        "clothes": Clothes,
+        "electronic": Electronic,
+    }
+
+    product_class = category_map.get(cat, Book)
+    products = db.load_entities(product_class)
+
+
+    return render_template("index.html", products=products, category=current_cat)
 
 
 @app.route("/login", methods=['GET', 'POST'])
