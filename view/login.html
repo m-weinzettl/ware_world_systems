@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>WarenWelt - Login</title>
+    <style>
+        .login-form { width: 300px; margin: 100px auto; padding: 20px; border: 1px solid #ccc; }
+        input { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="login-form">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <label>E-Mail:</label>
+        <input type="email" name="email" required>
+
+        <label>Passwort:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Einloggen</button>
+    </form>
+    <p><a href="/">Zurück zum Shop</a></p>
+</div>
+
+</body>
+</html>

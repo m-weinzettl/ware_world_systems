@@ -9,7 +9,7 @@ class DB_Manager:
             "user": "neondb_owner",
             "password": "npg_7cGaDp0ToQCt",
             "host": "ep-falling-glitter-ant3xu4o-pooler.c-6.us-east-1.aws.neon.tech",
-            "port": 5432,  # Wieder zurück auf den Standard!
+            "port": 5432,
             "sslmode": "require"
         }
     def save_entity(self, entity):
@@ -90,4 +90,19 @@ class DB_Manager:
                     return None
         except psycopg2.Error as e:
             print(f"Fehler beim Laden der Rechnungsdaten: {e}")
+            return None
+
+    def check_login(self, email, password):
+        query = "SELECT id, name, email FROM customer WHERE email = %s AND password = %s"
+        try:
+            with psycopg2.connect(**self.params) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, (email, password))
+                    row = cursor.fetchone()
+                    if row:
+                        from model.customer.customer import Customer
+                        return Customer(*row)
+                    return None
+        except psycopg2.Error as e:
+            print(f"Login-Fehler: {e}")
             return None
