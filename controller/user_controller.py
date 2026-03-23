@@ -17,8 +17,7 @@ def login():
         if user:
             session["user_id"] = str(user.id)
             session["user_name"] = user.name
-            # Zurück zur Hauptseite (die wahrscheinlich in einem anderen Blueprint liegt)
-            return redirect(url_for("index"))
+            return redirect(url_for("product.index"))
 
         return render_template("login.html", error="Ungültige Zugangsdaten")
 
@@ -48,4 +47,4 @@ def register():
 @user_bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("product.index"))
