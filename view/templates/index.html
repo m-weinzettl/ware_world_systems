@@ -24,7 +24,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center">
-                    {% if session['user_name'] %}
+                    {% if session.get('user_name') %}
                         <span class="navbar-text me-3 text-white">Willkommen, <strong>{{ session['user_name'] }}</strong></span>
                         <a class="nav-link" href="/cart">🛒 Warenkorb</a>
                         <a class="btn btn-outline-danger btn-sm ms-2" href="{{ url_for('user.logout') }}">Logout</a>
