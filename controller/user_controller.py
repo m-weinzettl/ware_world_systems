@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from database.db_manager import DB_Manager
 from model.customer.customer import Customer
+from model.customer.private_customer import Private_Customer
+from model.customer.company_customer import Company_Customer
 from model.validator import Validator
 from werkzeug.security import generate_password_hash
 
@@ -19,6 +21,7 @@ def login():
         if user:
             session["user_id"] = str(user.id)
             session["user_name"] = user.name
+            session["is_company"] = hasattr(user, "uid") and user.uid is not None
             return redirect(url_for("product.index"))
 
         return render_template("login.html", error="Ungültige Zugangsdaten")
@@ -34,20 +37,28 @@ def register():
         password = request.form.get('password')
         tel = request.form.get('tel', '')
         addr = request.form.get('address', '')
-        geb = request.form.get('geb_date', None)
+        geb_date = request.form.get('geb_date', None)
+        uid = request.form.get('uid', None)
 
         # 1. Validierung (Stärke prüfen)
         is_valid, result = Validator.validate_password(password)
         if not is_valid:
             return render_template("register.html", error=result)
+        is_valid_mail, mail_result = Validator.validate_mail(mail)
+        if not is_valid_mail:
+            return render_template("register.html", error=f"E-Mail ungültig: {mail_result}")
+
+        if uid:
+            # Erstelle Firmenkunden
+            new_customer = Company_Customer(None, mail, tel, name, addr, uid)
+        else:
+            # Erstelle Privatkunden
+            new_customer = Private_Customer(None, mail, tel, name, addr, geb_date)
 
         # 2. Hashing (Standard-Einstellungen nutzen)
         hashed_password = generate_password_hash(password)
 
-        # 3. Customer-Objekt erstellen
-        new_customer = Customer(None, mail, tel, name, addr, geb, None)
-
-        # 4. Speichern (WICHTIG: hashed_password übergeben!)
+        # Speichern (WICHTIG: hashed_password übergeben!)
         db = DB_Manager()
         db.save_entity(new_customer, hashed_password)
 
