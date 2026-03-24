@@ -112,21 +112,21 @@ class DB_Manager:
                         if check_password_hash(hashed_pw_from_db, password):
                             display_name = row[4] if row[4] else row[6]
                             return Customer(
-                            customer_id=row[0],
-                            mail=row[1],
-                            tel_number=row[2],
-                            name=display_name,
-                            address=row[3],
-                            geb_date=row[5],
-                            uid=row[7]
-                        )
+                                customer_id=row[0],
+                                mail=row[1],
+                                tel_number=row[2],
+                                name=display_name,
+                                address=row[3],
+                                geb_date=row[5],
+                                uid=row[7]
+                            )
 
                         # Mapping der DB-Zeile auf deine Customer-Klasse:
                         # row[0]=id, row[1]=mail, row[2]=tel, row[3]=address
                         # row[4]=name_private (p), row[5]=geb_date, row[6]=name_customer (co), row[7]=uid
 
                          # Privatname oder Firmenname
-                return None
+            return None
         except psycopg2.Error as e:
             print(f"Login-Fehler: {e}")
             return None
