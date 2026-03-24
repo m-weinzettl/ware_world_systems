@@ -19,6 +19,7 @@ def login():
         user = db.check_login(email_from_form, password_from_form)
 
         if user:
+            session.permanent = True
             session["user_id"] = str(user.id)
             session["user_name"] = user.name
             session["is_company"] = hasattr(user, "uid") and user.uid is not None
@@ -27,6 +28,7 @@ def login():
         return render_template("login.html", error="Ungültige Zugangsdaten")
 
     return render_template("login.html")
+
 
 
 @user_bp.route("/register", methods=['GET', 'POST'])

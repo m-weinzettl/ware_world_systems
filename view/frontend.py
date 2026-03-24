@@ -10,8 +10,14 @@ app.secret_key = 'ein_ganz_geheimer_schluessel'
 
 # Blueprint registrieren
 app.register_blueprint(user_bp)
-
 app.register_blueprint(product_bp)
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    PERMANENT_SESSION_LIFETIME=1800 # 30 Minuten Haltbarkeit
+)
 
 if __name__ == "__main__":
     app.run(debug=True)
