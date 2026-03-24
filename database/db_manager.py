@@ -95,38 +95,46 @@ class DB_Manager:
             return None
 
 
-#gehört noch in den customer ausgelagert
-    def check_login(self, mail, password):
-        from werkzeug.security import check_password_hash
-        from model.customer.customer import Customer
-        # Wir holen uns alle Basis-Daten, um das Objekt korrekt zu befüllen
-        login = Customer.login_query()
-        try:
-            with psycopg2.connect(**self.params) as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(login, (mail,))
-                    row = cursor.fetchone()
-                    if row:
-                        hashed_pw_from_db = row[8]
+def check_login(self, mail, password):
+    from werkzeug.security import check_password_hash
+    from model.customer.customer import Customer
+    from model.customer.private_customer import Private_Customer
+    from model.customer.company_customer import Company_Customer
 
-                        if check_password_hash(hashed_pw_from_db, password):
-                            display_name = row[4] if row[4] else row[6]
-                            return Customer(
+    login_query = Customer.login_query()
+    try:
+        with psycopg2.connect(**self.params) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(login_query, (mail,))
+                row = cursor.fetchone()
+
+                if row:
+                    # Index 8 ist das Passwort laut deinem SQL
+                    hashed_pw_from_db = row[8]
+
+                    if check_password_hash(hashed_pw_from_db, password):
+                        # Fallunterscheidung: Firma oder Privat?
+                        # row[7] ist die UID (Company), row[5] ist Geb_Date (Privat)
+
+                        if row[7]:  # Wenn eine UID existiert -> Company
+                            return Company_Customer(
                                 customer_id=row[0],
                                 mail=row[1],
                                 tel_number=row[2],
-                                name=display_name,
+                                name=row[6],  # company_name
                                 address=row[3],
-                                geb_date=row[5],
                                 uid=row[7]
                             )
-
-                        # Mapping der DB-Zeile auf deine Customer-Klasse:
-                        # row[0]=id, row[1]=mail, row[2]=tel, row[3]=address
-                        # row[4]=name_private (p), row[5]=geb_date, row[6]=name_customer (co), row[7]=uid
-
-                         # Privatname oder Firmenname
-            return None
-        except psycopg2.Error as e:
-            print(f"Login-Fehler: {e}")
-            return None
+                        else:  # Ansonsten -> Private
+                            return Private_Customer(
+                                customer_id=row[0],
+                                mail=row[1],
+                                tel_number=row[2],
+                                name=row[4],  # p.name
+                                address=row[3],
+                                geb_date=row[5]
+                            )
+        return None
+    except psycopg2.Error as e:
+        print(f"Login-Fehler: {e}")
+        return None

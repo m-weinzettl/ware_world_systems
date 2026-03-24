@@ -27,7 +27,7 @@
                     {% if session.get('user_name') %}
                         <span class="navbar-text me-3 text-white">Willkommen, <strong>{{ session['user_name'] }}</strong></span>
                         <a class="nav-link" href="/cart">🛒 Warenkorb</a>
-                        <h1>XXX</h1>
+                        <span class="badge bg-warning text-dark ms-2 me-2">XXX</span>
                         <a class="btn btn-outline-danger btn-sm ms-2" href="{{ url_for('user.logout') }}">Logout</a>
                     {% else %}
                         <a class="nav-link" href="{{ url_for('user.login') }}">Login</a>
@@ -43,7 +43,7 @@
             <h1 class="display-5 fw-bold">Unsere Produkte</h1>
             <p class="text-muted">Wählen Sie eine Kategorie zum Stöbern</p>
 
-            <div class="btn-group shadow-sm" role="group" aria-label="Kategorie Filter">
+            <div class="btn-group shadow-sm" role="group">
                 <a href="{{ url_for('product.index', cat='books') }}"
                    class="btn btn-outline-dark {{ 'active' if category == 'books' or not category }}">📚 Bücher</a>
                 <a href="{{ url_for('product.index', cat='electronic') }}"
@@ -68,46 +68,45 @@
             <div class="col">
                 <div class="card h-100 shadow-sm product-card">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-primary">{{ product.title }}</h5>
+                        <h5 class="card-title text-primary">{{ product.name }}</h5>
 
                         <div class="card-text mb-3">
                             {% if category == 'electronic' %}
-                                <small class="text-muted d-block">Hersteller: <strong>{{ product.manufacturer }}</strong></small>
+                                <small class="text-muted d-block">Marke: <strong>{{ product.brand }}</strong></small>
+                                <small class="text-muted d-block">Garantie: <strong>{{ product.guarantee }} Monate</strong></small>
                             {% elif category == 'clothes' %}
-                                <small class="text-muted d-block">Material: <strong>{{ product.material }}</strong></small>
+                                <small class="text-muted d-block">Farbe: <strong>{{ product.color }}</strong></small>
                                 <small class="text-muted d-block">Größe: <span class="badge bg-info text-dark">{{ product.size }}</span></small>
                             {% elif category == 'books' %}
                                 <small class="text-muted d-block">Autor: <strong>{{ product.autor }}</strong></small>
-                            {% else %}
-                                <small class="text-muted d-block">Produkt-Details verfügbar</small>
+                                <small class="text-muted d-block">Seiten: <strong>{{ product.page_numbers }}</strong></small>
                             {% endif %}
+                            <small class="text-muted d-block">Gewicht: {{ product.weight }}kg</small>
                         </div>
 
                         <p class="fs-4 fw-bold mt-auto text-dark">{{ "%.2f"|format(product.price) }} €</p>
 
-                        {% if session['user_id'] %}
+                        {% if session.get('user_id') %}
                             <form action="/add_to_cart" method="post">
-                                <input type="hidden" name="p_id" value="{{ product.id }}">
-                                <button type="submit" class="btn btn-success w-100">
-                                    <i class="bi bi-cart-plus"></i> In den Warenkorb
-                                </button>
+                                <input type="hidden" name="p_id" value="{{ product.product_id }}">
+                                <button type="submit" class="btn btn-success w-100">In den Warenkorb</button>
                             </form>
                         {% else %}
-                            <a href="/login" class="btn btn-outline-primary w-100">Login zum Kaufen</a>
+                            <a href="{{ url_for('user.login') }}" class="btn btn-outline-primary w-100">Login zum Kaufen</a>
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% else %}
             <div class="col-12 text-center py-5">
-                <p class="text-muted italic">Momentan sind keine Produkte in dieser Kategorie verfügbar.</p>
+                <p class="text-muted">Keine Produkte in dieser Kategorie verfügbar.</p>
             </div>
             {% endfor %}
         </div>
     </div>
 
     <footer class="py-4 mt-5 bg-white border-top text-center text-muted">
-        <p>&copy; 2026 Waren Welt Shop - Ihr zuverlässiger Partner</p>
+        <p>&copy; 2026 Waren Welt Shop</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
