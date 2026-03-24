@@ -97,24 +97,21 @@ class DB_Manager:
 
 #gehört noch in den customer ausgelagert
     def check_login(self, mail, password):
+        from werkzeug.security import check_password_hash
         from model.customer.customer import Customer
         # Wir holen uns alle Basis-Daten, um das Objekt korrekt zu befüllen
         login = Customer.login_query()
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(login, (mail, password))
+                    cursor.execute(login, (mail,))
                     row = cursor.fetchone()
                     if row:
-                        from model.customer.customer import Customer
+                        hashed_pw_from_db = row[8]
 
-                        # Mapping der DB-Zeile auf deine Customer-Klasse:
-                        # row[0]=id, row[1]=mail, row[2]=tel, row[3]=address
-                        # row[4]=name (p), row[5]=geb_date, row[6]=name (co), row[7]=uid
-
-                        display_name = row[4] if row[4] else row[6]  # Privatname oder Firmenname
-
-                        return Customer(
+                        if check_password_hash(hashed_pw_from_db, password):
+                            display_name = row[4] if row[4] else row[6]
+                            return Customer(
                             customer_id=row[0],
                             mail=row[1],
                             tel_number=row[2],
@@ -123,7 +120,13 @@ class DB_Manager:
                             geb_date=row[5],
                             uid=row[7]
                         )
-                    return None
+
+                        # Mapping der DB-Zeile auf deine Customer-Klasse:
+                        # row[0]=id, row[1]=mail, row[2]=tel, row[3]=address
+                        # row[4]=name_private (p), row[5]=geb_date, row[6]=name_customer (co), row[7]=uid
+
+                         # Privatname oder Firmenname
+                return None
         except psycopg2.Error as e:
             print(f"Login-Fehler: {e}")
             return None

@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from database.db_manager import DB_Manager
 from model.customer.customer import Customer
+from model.validator import Validator
+from werkzeug.security import generate_password_hash
 
 # Blueprint definieren
 user_bp = Blueprint('user', __name__)
@@ -23,6 +25,7 @@ def login():
 
     return render_template("login.html")
 
+
 @user_bp.route("/register", methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -33,13 +36,21 @@ def register():
         addr = request.form.get('address', '')
         geb = request.form.get('geb_date', None)
 
-        # Neues Customer-Objekt erstellen
+        # 1. Validierung (Stärke prüfen)
+        is_valid, result = Validator.validate_password(password)
+        if not is_valid:
+            return render_template("register.html", error=result)
+
+        # 2. Hashing (Standard-Einstellungen nutzen)
+        hashed_password = generate_password_hash(password)
+
+        # 3. Customer-Objekt erstellen
         new_customer = Customer(None, mail, tel, name, addr, geb, None)
 
+        # 4. Speichern (WICHTIG: hashed_password übergeben!)
         db = DB_Manager()
-        db.save_entity(new_customer, password)
+        db.save_entity(new_customer, hashed_password)
 
-        # Nach Registrierung zum Login (innerhalb dieses Blueprints)
         return redirect(url_for('user.login'))
 
     return render_template("register.html")

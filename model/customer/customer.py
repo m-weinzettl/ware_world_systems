@@ -87,9 +87,9 @@ class Customer:
         return """
             SELECT c.customer_id, c.mail, c.tel_number, c.address, 
                    p.name, p.geb_date, 
-                   co.company_name, co.uid_number
+                   co.company_name, co.uid_number, c.password
             FROM public.customer c
             LEFT JOIN public.private_customer p ON c.customer_id = p.customer_id
             LEFT JOIN public.company_customer co ON c.customer_id = co.customer_id
-            WHERE c.mail = %s AND c.password = %s
+            WHERE c.mail = %s
         """
