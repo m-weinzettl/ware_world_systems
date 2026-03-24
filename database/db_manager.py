@@ -12,6 +12,7 @@ class DB_Manager:
             "port": 5432,
             "sslmode": "require"
         }
+
     def save_entity(self, entity, password=None): # password als optionaler Parameter
         try:
             with psycopg2.connect(**self.params) as conn:
@@ -66,7 +67,7 @@ class DB_Manager:
                     new_order_id = result[0] if result else None
                     # cart nach Kauf löschen
                     cursor.execute(
-                        "DELETE FROM shopping_cart WHERE customer_id = %s",
+                        cart.delete_save_order(),
                         (str(cart.customer.id),)
                     )
                     conn.commit()
@@ -76,7 +77,8 @@ class DB_Manager:
             return None
 
     def get_invoice_data(self, order_id):
-        query = "SELECT * FROM orders WHERE order_id = %s"
+        from model.shopping_cart.shopping_cart import Shopping_Cart
+        query = Shopping_Cart.get_data_query()
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
@@ -92,22 +94,16 @@ class DB_Manager:
             print(f"Fehler beim Laden der Rechnungsdaten: {e}")
             return None
 
-    def check_login(self, mail, password):
-        # Wir holen uns alle Basis-Daten, um das Objekt korrekt zu befüllen
-        query = """
-            SELECT c.customer_id, c.mail, c.tel_number, c.address, 
-                   p.name, p.geb_date, 
-                   co.company_name, co.uid_number
-            FROM public.customer c
-            LEFT JOIN public.private_customer p ON c.customer_id = p.customer_id
-            LEFT JOIN public.company_customer co ON c.customer_id = co.customer_id
-            WHERE c.mail = %s AND c.password = %s
-        """
 
+#gehört noch in den customer ausgelagert
+    def check_login(self, mail, password):
+        from model.customer.customer import Customer
+        # Wir holen uns alle Basis-Daten, um das Objekt korrekt zu befüllen
+        login = Customer.login_query()
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(query, (mail, password))
+                    cursor.execute(login, (mail, password))
                     row = cursor.fetchone()
                     if row:
                         from model.customer.customer import Customer

@@ -56,3 +56,11 @@ class Shopping_Cart:
         INSERT INTO orders (customer_id, total_price, invoice_data, is_company_order)
         VALUES (%s, %s, %s, %s) RETURNING order_id
         """
+
+    @staticmethod
+    def delete_save_order():
+        return """DELETE FROM shopping_cart WHERE customer_id = %s"""
+
+    @staticmethod
+    def get_data_query():
+        return """SELECT * FROM orders WHERE order_id = %s"""
