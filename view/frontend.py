@@ -4,7 +4,8 @@ from flask import Flask, render_template, session
 from controller.user_controller import user_bp
 from controller.product_controller import product_bp
 
-app = Flask(__name__, template_folder='.')
+
+app = Flask(__name__, template_folder='templates')
 app.secret_key = 'ein_ganz_geheimer_schluessel'
 
 # Blueprint registrieren
