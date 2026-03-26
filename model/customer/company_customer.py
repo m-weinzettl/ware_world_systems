@@ -14,14 +14,10 @@ class Company_Customer(Customer):
         """
 
     def get_save_queries(self, password):
-        query1 = """
-            INSERT INTO public.customer (mail, tel_number, address, password) 
-            VALUES (%s, %s, %s, %s) 
-            RETURNING customer_id
-        """
-        data1 = (self.mail, self.tel_number, self.address, password)
+        queries = super().get_save_queries(password)
 
         query2 = "INSERT INTO public.company_customer (customer_id, company_name, uid_number) VALUES (%s, %s, %s)"
-        data2 = (None, self.name, self.uid)
+        data2 = (str(self.id), self.name, self.uid)
 
-        return [(query1, data1), (query2, data2)]
+        queries.append((query2, data2))
+        return queries

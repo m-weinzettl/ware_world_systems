@@ -74,11 +74,15 @@ class Customer:
         return f"Customer(Name: {self.name}, E-Mail: {self.mail}, Tel: {self.tel_number}, Geb-Date: {self.geb_date})"
 
     # In model/customer/customer.py
+    # In model/customer/customer.py
     def get_save_queries(self, password):
+        # Wir fügen customer_id wieder hinzu, damit self.id übertragen wird
         query = """
             INSERT INTO public.customer (customer_id, mail, tel_number, address, password) 
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s) 
+            RETURNING customer_id
         """
+        # str(self.id) stellt sicher, dass die UUID als String an Postgres geht
         data = (str(self.id), self.mail, self.tel_number, self.address, password)
         return [(query, data)]
 
