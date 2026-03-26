@@ -87,7 +87,7 @@
 
                         <p class="fs-4 fw-bold mt-auto text-dark">{{ "%.2f"|format(product.price) }} €</p>
 
-                        {% if session.get('user_id') %}
+                        {% if session.get('customer_id') %}
                             <form action="/add_to_cart" method="post">
                                 <input type="hidden" name="p_id" value="{{ product.product_id }}">
                                 <button type="submit" class="btn btn-success w-100">In den Warenkorb</button>
