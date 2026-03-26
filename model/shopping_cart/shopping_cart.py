@@ -53,9 +53,9 @@ class Shopping_Cart:
     @staticmethod
     def save_invoice_query():
         return """
-        INSERT INTO public.orders (customer_id, total_price, invoice_data, is_company_order)
-        VALUES (%s, %s, %s, %s) RETURNING order_id
-        """
+            INSERT INTO public.orders (order_id, customer_id, total_price, invoice_data, is_company_order)
+            VALUES (%s, %s, %s, %s, %s) RETURNING order_id
+            """
 
     @staticmethod
     def delete_save_order():

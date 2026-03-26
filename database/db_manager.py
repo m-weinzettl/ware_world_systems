@@ -1,3 +1,5 @@
+import uuid
+
 import psycopg2
 import json
 from model.shopping_cart.shopping_cart import Shopping_Cart
@@ -63,12 +65,16 @@ class DB_Manager:
             return []
 
     def save_order(self, cart: Shopping_Cart):
+        import uuid
+        generate_id = str(uuid.uuid4())
         final_price, _ = cart.get_total_price()
+
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
                     query = cart.save_invoice_query()
                     data = (
+                        generate_id,
                         str(cart.customer.id),
                         final_price,
                         cart.generate_invoice_data(),
