@@ -24,10 +24,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center">
-                    {% if session.get('user_name') %}
-                        <span class="navbar-text me-3 text-white">Willkommen, <strong>{{ session['user_name'] }}</strong></span>
+                    {% if session.get('customer_id') or session.get('user_id') %}
+                        <span class="navbar-text me-3 text-white">
+                            Willkommen, <strong>{{ session.get('user_name') or 'Kunde' }}</strong>
+                        </span>
                         <a class="nav-link" href="/cart">🛒 Warenkorb</a>
-                        <span class="badge bg-warning text-dark ms-2 me-2">XXX</span>
                         <a class="btn btn-outline-danger btn-sm ms-2" href="{{ url_for('user.logout') }}">Logout</a>
                     {% else %}
                         <a class="nav-link" href="{{ url_for('user.login') }}">Login</a>
