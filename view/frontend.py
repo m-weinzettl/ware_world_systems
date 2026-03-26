@@ -18,9 +18,10 @@ app.register_blueprint(cart_bp)
 
 app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=True,   # Muss True sein für HTTPS auf Render
     SESSION_COOKIE_HTTPONLY=True,
-    PERMANENT_SESSION_LIFETIME=1800 # 30 Minuten Haltbarkeit
+    SESSION_PERMANENT=True,
+    PERMANENT_SESSION_LIFETIME=1800
 )
 
 if __name__ == "__main__":

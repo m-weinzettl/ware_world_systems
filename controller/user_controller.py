@@ -20,7 +20,7 @@ def login():
 
         if user:
             session.permanent = True
-            session["user_id"] = str(getattr(user, 'customer_id', getattr(user, 'id', None)))
+            session["customer_id"] = str(getattr(user, 'customer_id', getattr(user, 'id', None)))
             session["user_name"] = user.name
             session["is_company"] = hasattr(user, "uid") and user.uid is not None
             return redirect(url_for("product.index"))
