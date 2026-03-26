@@ -13,15 +13,36 @@ class DB_Manager:
             "sslmode": "require"
         }
 
-    def save_entity(self, entity, password=None): # password als optionaler Parameter
+    def save_entity(self, entity, password=None):
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    for query, data in entity.get_save_queries(password):
-                        cursor.execute(query, data)
+                    # Holt die Liste der Queries (0: customer, 1: private/company)
+                    queries = entity.get_save_queries(password)
+
+                    cust_query, cust_data = queries[0]
+                    if "RETURNING" not in cust_query.upper():
+                        cust_query += " RETURNING customer_id"
+
+                    cursor.execute(cust_query, cust_data)
+                    generated_id = cursor.fetchone()[0]  # Hier ist die neue UUID!
+
+                    # 2. Untertabelle mit der ECHTEN ID füttern
+                    sub_query, sub_data = queries[1]
+
+                    # Wir wandeln das Tuple in eine Liste um, um den ersten Wert (None)
+                    # durch die generierte ID zu ersetzen
+                    final_sub_data = list(sub_data)
+                    final_sub_data[0] = generated_id
+
+                    cursor.execute(sub_query, tuple(final_sub_data))
+
                     conn.commit()
+                    print(f"DEBUG: Registrierung erfolgreich für ID {generated_id}")
         except psycopg2.Error as e:
             print(f"Fehler beim Speichern: {e}!")
+            if conn:
+                conn.rollback()
 
     def load_entities(self, entity_class):
         try:
