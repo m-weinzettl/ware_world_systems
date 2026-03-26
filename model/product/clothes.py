@@ -29,6 +29,6 @@ class Clothes(Product):
     def get_load_query():
         return """
             SELECT p.product_id, p.name, p.price, p.weight, c.size, c.color 
-            FROM product p
-            JOIN clothes_product c ON p.product_id = c.product_id
+            FROM public.product p
+            JOIN public.clothes_product c ON p.product_id = c.product_id
         """

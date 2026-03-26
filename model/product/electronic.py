@@ -29,6 +29,6 @@ class Electronic(Product):
     def get_load_query():
         return """
                     SELECT p.product_id, p.name, p.price, p.weight, e.brand, e.guarantee_months 
-                    FROM product p
-                    JOIN electronic_product e ON p.product_id = e.product_id
+                    FROM public.product p
+                    JOIN public.electronic_product e ON p.product_id = e.product_id
                 """

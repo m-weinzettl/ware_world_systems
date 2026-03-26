@@ -40,4 +40,4 @@ class Product:
 
     @staticmethod
     def get_load_query():
-        return "SELECT product_id, name, price, weight FROM product"
+        return "SELECT product_id, name, price, weight FROM public.product"

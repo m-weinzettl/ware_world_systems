@@ -30,6 +30,6 @@ class Book(Product):
     def get_load_query():
         return """
                 SELECT p.product_id, p.name, p.price, p.weight, b.autor, b.page_numbers 
-                FROM product p
-                JOIN book_product b ON p.product_id = b.product_id
+                FROM public.product p
+                JOIN public.book_product b ON p.product_id = b.product_id
             """

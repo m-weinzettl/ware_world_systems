@@ -53,18 +53,23 @@ class Shopping_Cart:
     @staticmethod
     def save_invoice_query():
         return """
-        INSERT INTO orders (customer_id, total_price, invoice_data, is_company_order)
+        INSERT INTO public.orders (customer_id, total_price, invoice_data, is_company_order)
         VALUES (%s, %s, %s, %s) RETURNING order_id
         """
 
     @staticmethod
     def delete_save_order():
-        return """DELETE FROM shopping_cart WHERE customer_id = %s"""
+        return """DELETE FROM public.shopping_cart WHERE customer_id = %s"""
 
     @staticmethod
     def get_data_query():
-        return """SELECT * FROM orders WHERE order_id = %s"""
+        return """SELECT * FROM public.orders WHERE order_id = %s"""
 
     @staticmethod
     def load_cart_items():
-        return "SELECT product_id FROM shopping_cart WHERE customer_id = %s"
+        return "SELECT product_id FROM public.shopping_cart WHERE customer_id = %s"
+
+    @staticmethod
+    def add_item_to_cart():
+        return """ INSERT INTO public.shopping_cart (customer_id, product_id)
+                    VALUES (%s, %s)"""
