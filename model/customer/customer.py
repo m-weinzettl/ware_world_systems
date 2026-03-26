@@ -93,3 +93,4 @@ class Customer:
             LEFT JOIN public.company_customer co ON c.customer_id = co.customer_id
             WHERE c.mail = %s
         """
+

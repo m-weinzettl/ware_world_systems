@@ -14,31 +14,39 @@ class DB_Manager:
         }
 
     def save_entity(self, entity, password=None):
+        conn = None
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    # Holt die Liste der Queries (0: customer, 1: private/company)
+                    # Holt die Liste der Queries (z.B. [(q1, d1), (q2, d2)])
                     queries = entity.get_save_queries(password)
 
+                    if not queries:
+                        return
+
+                    # 1. Die Haupt-Tabelle ausführen (z.B. public.customer)
                     cust_query, cust_data = queries[0]
-                    if "RETURNING" not in cust_query.upper():
+
+                    # Wir brauchen RETURNING nur, wenn es einen zweiten Teil gibt
+                    if len(queries) > 1 and "RETURNING" not in cust_query.upper():
                         cust_query += " RETURNING customer_id"
 
                     cursor.execute(cust_query, cust_data)
-                    generated_id = cursor.fetchone()[0]  # Hier ist die neue UUID!
 
-                    # 2. Untertabelle mit der ECHTEN ID füttern
-                    sub_query, sub_data = queries[1]
+                    # Falls es eine Untertabelle gibt, ID abfangen und einsetzen
+                    if len(queries) > 1:
+                        generated_id = cursor.fetchone()[0]
 
-                    # Wir wandeln das Tuple in eine Liste um, um den ersten Wert (None)
-                    # durch die generierte ID zu ersetzen
-                    final_sub_data = list(sub_data)
-                    final_sub_data[0] = generated_id
+                        sub_query, sub_data = queries[1]
+                        final_sub_data = list(sub_data)
 
-                    cursor.execute(sub_query, tuple(final_sub_data))
+                        # Die generierte ID an die erste Stelle der Sub-Daten setzen
+                        final_sub_data[0] = str(generated_id)
+
+                        cursor.execute(sub_query, tuple(final_sub_data))
 
                     conn.commit()
-                    print(f"DEBUG: Registrierung erfolgreich für ID {generated_id}")
+                    print(f"DEBUG: Speichern erfolgreich.")
         except psycopg2.Error as e:
             print(f"Fehler beim Speichern: {e}!")
             if conn:

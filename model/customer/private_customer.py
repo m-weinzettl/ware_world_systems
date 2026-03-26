@@ -11,3 +11,15 @@ class Private_Customer(Customer):
             FROM customer c
             JOIN private_customer p ON c.customer_id = p.customer_id
         """
+
+
+    def get_save_queries(self, password):
+        # Query 1: Basis-Daten
+        query1 = "INSERT INTO public.customer (mail, tel_number, address, password) VALUES (%s, %s, %s, %s) RETURNING customer_id"
+        data1 = (self.mail, self.tel_number, self.address, password)
+
+        # Query 2: Private-Daten (ID wird vom DB_Manager gesetzt)
+        query2 = "INSERT INTO public.private_customer (customer_id, name, geb_date) VALUES (%s, %s, %s)"
+        data2 = (None, self.name, self.geb_date)
+
+        return [(query1, data1), (query2, data2)]
