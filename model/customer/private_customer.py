@@ -14,11 +14,15 @@ class Private_Customer(Customer):
 
 
     def get_save_queries(self, password):
-        # Query 1: Basis-Daten
-        query1 = "INSERT INTO public.customer (mail, tel_number, address, password) VALUES (%s, %s, %s, %s) RETURNING customer_id"
+        # Query 1: Basis-Daten (customer_id WEGLASSEN, damit DEFAULT greift)
+        query1 = """
+            INSERT INTO public.customer (mail, tel_number, address, password) 
+            VALUES (%s, %s, %s, %s) 
+            RETURNING customer_id
+        """
         data1 = (self.mail, self.tel_number, self.address, password)
 
-        # Query 2: Private-Daten (ID wird vom DB_Manager gesetzt)
+        # Query 2: Untertabelle (ID wird vom DB_Manager eingesetzt)
         query2 = "INSERT INTO public.private_customer (customer_id, name, geb_date) VALUES (%s, %s, %s)"
         data2 = (None, self.name, self.geb_date)
 

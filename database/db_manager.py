@@ -14,43 +14,28 @@ class DB_Manager:
         }
 
     def save_entity(self, entity, password=None):
-        conn = None
         try:
             with psycopg2.connect(**self.params) as conn:
                 with conn.cursor() as cursor:
-                    # Holt die Liste der Queries (z.B. [(q1, d1), (q2, d2)])
                     queries = entity.get_save_queries(password)
 
-                    if not queries:
-                        return
+                    # 1. Customer Tabelle (gibt ID zurück)
+                    query1, data1 = queries[0]
+                    cursor.execute(query1, data1)
+                    generated_id = cursor.fetchone()[0]
 
-                    # 1. Die Haupt-Tabelle ausführen (z.B. public.customer)
-                    cust_query, cust_data = queries[0]
+                    # 2. Untertabelle (nutzt generierte ID)
+                    query2, data2 = queries[1]
+                    final_data2 = list(data2)
+                    final_data2[0] = generated_id  # None durch echte ID ersetzen
 
-                    # Wir brauchen RETURNING nur, wenn es einen zweiten Teil gibt
-                    if len(queries) > 1 and "RETURNING" not in cust_query.upper():
-                        cust_query += " RETURNING customer_id"
-
-                    cursor.execute(cust_query, cust_data)
-
-                    # Falls es eine Untertabelle gibt, ID abfangen und einsetzen
-                    if len(queries) > 1:
-                        generated_id = cursor.fetchone()[0]
-
-                        sub_query, sub_data = queries[1]
-                        final_sub_data = list(sub_data)
-
-                        # Die generierte ID an die erste Stelle der Sub-Daten setzen
-                        final_sub_data[0] = str(generated_id)
-
-                        cursor.execute(sub_query, tuple(final_sub_data))
+                    cursor.execute(query2, tuple(final_data2))
 
                     conn.commit()
-                    print(f"DEBUG: Speichern erfolgreich.")
+                    print(f"DEBUG: Registrierung erfolgreich für {generated_id}")
         except psycopg2.Error as e:
             print(f"Fehler beim Speichern: {e}!")
-            if conn:
-                conn.rollback()
+            # WICHTIG: Kein conn.rollback() ohne aktive Connection
 
     def load_entities(self, entity_class):
         try:

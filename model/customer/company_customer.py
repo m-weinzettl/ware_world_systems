@@ -14,7 +14,11 @@ class Company_Customer(Customer):
         """
 
     def get_save_queries(self, password):
-        query1 = "INSERT INTO public.customer (mail, tel_number, address, password) VALUES (%s, %s, %s, %s) RETURNING customer_id"
+        query1 = """
+            INSERT INTO public.customer (mail, tel_number, address, password) 
+            VALUES (%s, %s, %s, %s) 
+            RETURNING customer_id
+        """
         data1 = (self.mail, self.tel_number, self.address, password)
 
         query2 = "INSERT INTO public.company_customer (customer_id, company_name, uid_number) VALUES (%s, %s, %s)"
