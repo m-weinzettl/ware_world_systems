@@ -189,3 +189,21 @@ class DB_Manager:
         except psycopg2.Error as err:
             print(f"Fehler beim Laden des Warenkorbs: {err}")
             return []
+
+    def add_item_to_cart(self, customer_id, product_id):
+        try:
+            with psycopg2.connect(**self.params) as conn:
+                with conn.cursor() as cursor:
+                    # Query zum Einfügen in die Warenkorb-Tabelle
+                    # Stelle sicher, dass die Tabelle 'shopping_cart' in Neon existiert
+                    query = """
+                        INSERT INTO public.shopping_cart (customer_id, product_id) 
+                        VALUES (%s, %s)
+                    """
+                    cursor.execute(query, (str(customer_id), str(product_id)))
+                    conn.commit()
+                    print(f"DEBUG: Produkt {product_id} für Kunde {customer_id} gespeichert.")
+                    return True
+        except psycopg2.Error as e:
+            print(f"Fehler beim Hinzufügen zum Warenkorb: {e}")
+            return False
