@@ -18,11 +18,9 @@ def add_to_cart():
         return redirect(url_for('user.login'))
 
     db = DB_Manager()
-    product = None
 
     try:
-        # Suche in allen Produktkategorien (da p_id eindeutig sein sollte)
-        # Wir nutzen hier p.product_id, passend zu deinem SQL in den Models
+        # 1. Wir prüfen erst, ob das Produkt existiert (Validierung)
         search_results = []
         search_results.extend(db.search_entities(Book, "p.product_id", p_id))
         search_results.extend(db.search_entities(Electronic, "p.product_id", p_id))
@@ -30,15 +28,18 @@ def add_to_cart():
 
         if search_results:
             product = search_results[0]
-            # Hier käme die Logik zum Speichern in der DB oder Session
-            # Da Shopping_Cart noch fehlt, hier als Platzhalter für die DB-Aktion:
-            # db.add_item_to_cart_table(customer_id, product.product_id)
-            flash(f"'{product.name}' wurde zum Warenkorb hinzugefügt!", "success")
+            # 2. ECHTE DB-AKTION: In die shopping_cart Tabelle schreiben
+            success = db.add_item_to_cart(customer_id, product.product_id)
+
+            if success:
+                flash(f"'{product.name}' wurde zum Warenkorb hinzugefügt!", "success")
+            else:
+                flash("Fehler beim Speichern im Warenkorb.", "danger")
         else:
             flash("Produkt konnte nicht gefunden werden.", "danger")
 
     except Exception as e:
-        flash(f"Fehler beim Hinzufügen: {str(e)}", "danger")
+        flash(f"Systemfehler: {str(e)}", "danger")
 
     return redirect(url_for('product.index'))
 
@@ -50,14 +51,21 @@ def show_cart():
         return redirect(url_for('user.login'))
 
     db = DB_Manager()
-    # Da wir Shopping_Cart noch nicht final haben, laden wir die Items über den DB_Manager
+    # Holt die echten Produkte + Mengen aus der shopping_cart Tabelle
     cart_items = db.get_cart_items(customer_id)
 
-    # Dummy-Kunde für das Template (sollte eigentlich aus der Session/DB kommen)
+    # Wir nutzen die Session-Daten, um das Customer-Objekt für den Warenkorb zu bauen
+    # user_email muss im user_controller gesetzt sein!
     from model.customer.private_customer import Private_Customer
-    current_customer = Private_Customer(customer_id, session.get('user_email'), "", session.get('user_name'), "", "")
+    current_customer = Private_Customer(
+        customer_id,
+        session.get('user_email', 'gast@wareworld.de'),
+        "",
+        session.get('user_name', 'Kunde'),
+        "",
+        ""
+    )
 
-    # Erstellung des Cart-Objekts für das Template
     cart = Shopping_Cart(current_customer)
     for item in cart_items:
         cart.add_item(item)
@@ -78,13 +86,21 @@ def checkout():
         flash("Dein Warenkorb ist leer!", "info")
         return redirect(url_for('cart.show_cart'))
 
-    # Warenkorb-Logik für den Checkout
     from model.customer.private_customer import Private_Customer
-    current_customer = Private_Customer(customer_id, "", "", session.get('user_name'), "", "")
+    current_customer = Private_Customer(
+        customer_id,
+        session.get('user_email', ''),
+        "",
+        session.get('user_name', 'Kunde'),
+        "",
+        ""
+    )
+
     new_cart = Shopping_Cart(current_customer)
     for item in cart_items:
         new_cart.add_item(item)
 
+    # Speichert die Order und LÖSCHT danach den Warenkorb in der DB
     order_id = db.save_order(new_cart)
 
     if order_id:
