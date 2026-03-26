@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Dein Warenkorb - Waren Welt</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">📦 Waren Welt</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Zurück zum Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mb-4">Dein Warenkorb</h2>
+
+        {% if cart.items %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Produkt</th>
+                                        <th>Details</th>
+                                        <th class="text-end">Preis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart.items %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ item.name }}</strong>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ item }}</small>
+                                        </td>
+                                        <td class="text-end">{{ "%.2f"|format(item.price|float) }} €</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Bestellübersicht</h5>
+                        </div>
+                        <div class="card-body">
+                            {% set final_price, discount = cart.get_total_price() %}
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Zwischensumme:</span>
+                                <span>{{ "%.2f"|format(final_price + discount) }} €</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Rabatt (5%):</span>
+                                <span>- {{ "%.2f"|format(discount) }} €</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong>Gesamtsumme:</strong>
+                                <strong class="fs-4 text-primary">{{ "%.2f"|format(final_price) }} €</strong>
+                            </div>
+
+                            <form action="/checkout" method="post">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">Jetzt zahlungspflichtig bestellen</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 p-3 bg-white border rounded shadow-sm">
+                        <small class="text-muted d-block">Rechnungsadresse:</small>
+                        <strong>{{ cart.customer.name }}</strong><br>
+                        <small>{{ cart.customer.address }}</small>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h4 class="text-muted">Dein Warenkorb ist leer.</h4>
+                <a href="/" class="btn btn-primary mt-3">Jetzt stöbern</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="py-4 mt-5 text-center text-muted">
+        <p>&copy; 2026 Waren Welt Shop</p>
+    </footer>
+
+</body>
+</html>
