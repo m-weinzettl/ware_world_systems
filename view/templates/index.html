@@ -12,6 +12,9 @@
         .product-card:hover {
             transform: translateY(-5px);
         }
+        .navbar-nav .nav-link {
+            margin-right: 1rem;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -26,9 +29,12 @@
                 <div class="navbar-nav ms-auto align-items-center">
                     {% if session.get('customer_id') %}
                         <span class="navbar-text me-3 text-white">
-                            Willkommen, <strong>{{ session.get('user_name')}}</strong>
+                            Willkommen, <strong>{{ session.get('user_name') }}</strong>
                         </span>
-                        <a class="nav-link" href="/cart">🛒 Warenkorb</a>
+                        <a class="nav-link" href="{{ url_for('cart.show_cart') }}">🛒 Warenkorb</a>
+
+                        <a class="nav-link" href="{{ url_for('cart.my_orders') }}">📜 Meine Bestellungen</a>
+
                         <a class="btn btn-outline-danger btn-sm ms-2" href="{{ url_for('user.logout') }}">Logout</a>
                     {% else %}
                         <a class="nav-link" href="{{ url_for('user.login') }}">Login</a>
@@ -40,17 +46,17 @@
     </nav>
 
     <div class="container mt-3">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-</div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
     <div class="container">
         <div class="text-center mb-5">
@@ -101,7 +107,7 @@
                         <p class="fs-4 fw-bold mt-auto text-dark">{{ "%.2f"|format(product.price) }} €</p>
 
                         {% if session.get('customer_id') %}
-                            <form action="/add_to_cart" method="post">
+                            <form action="{{ url_for('cart.add_to_cart') }}" method="post">
                                 <input type="hidden" name="p_id" value="{{ product.product_id }}">
                                 <button type="submit" class="btn btn-success w-100">In den Warenkorb</button>
                             </form>
