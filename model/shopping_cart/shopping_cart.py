@@ -66,6 +66,10 @@ class Shopping_Cart:
         return """SELECT * FROM public.orders WHERE order_id = %s"""
 
     @staticmethod
+    def get_all_orders_per_customer():
+        return """SELECT order_id FROM public.orders WHERE customer_id = %s"""
+
+    @staticmethod
     def load_cart_items():
         return "SELECT product_id FROM public.shopping_cart WHERE customer_id = %s"
 

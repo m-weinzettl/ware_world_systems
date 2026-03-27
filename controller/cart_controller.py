@@ -43,6 +43,29 @@ def add_to_cart():
 
     return redirect(url_for('product.index'))
 
+@cart_bp.route("/remove_from_cart", methods=['POST'])
+def remove_from_cart():
+    p_id = request.form.get('p_id')
+    customer_id = session.get('customer_id')
+
+    if not customer_id:
+        flash("Bitte logge dich ein, um Artikel aus dem Warenkorb zu entfernen.", "warning")
+        return redirect(url_for('user.login'))
+
+    db = DB_Manager()
+
+    try:
+        success = db.remove_item_from_cart(customer_id, p_id)
+
+        if success:
+            flash("Artikel wurde aus dem Warenkorb entfernt!", "success")
+        else:
+            flash("Fehler beim Entfernen des Artikels.", "danger")
+
+    except Exception as e:
+        flash(f"Systemfehler: {str(e)}", "danger")
+
+    return redirect(url_for('cart.show_cart'))
 
 @cart_bp.route("/cart")
 def show_cart():
@@ -71,7 +94,6 @@ def show_cart():
         cart.add_item(item)
 
     return render_template("cart.html", cart=cart)
-
 
 @cart_bp.route("/checkout", methods=['POST'])
 def checkout():
@@ -108,3 +130,46 @@ def checkout():
     else:
         flash("Fehler beim Abschließen der Bestellung.", "danger")
         return redirect(url_for('cart.show_cart'))
+
+@cart_bp.route("/my_orders")
+def my_orders():
+    customer_id = session.get('customer_id')
+    if not customer_id:
+        return redirect(url_for('user.login'))
+    db = DB_Manager()
+    orders = db.get_orders_per_customer(customer_id)
+    return render_template("my_orders.html", orders=orders)
+
+
+@cart_bp.route("/download_invoice/<order_id>")
+def download_invoice(order_id):
+    customer_id = session.get('customer_id')
+    if not customer_id:
+        return redirect(url_for('user.login'))
+
+    db = DB_Manager()
+    # Nutzt deine existierende get_invoice_data Methode
+    invoice_data = db.get_invoice_data(order_id)
+
+    if not invoice_data:
+        flash("Rechnungsdaten konnten nicht gefunden werden.", "danger")
+        return redirect(url_for('cart.my_orders'))
+
+    import io
+    from flask import send_file
+    from controller.pdf_generator import Invoice_To_PDF  # Pfad ggf. anpassen
+
+    # PDF generieren mit deiner Invoice_To_PDF Klasse
+    pdf_gen = Invoice_To_PDF(invoice_data)
+    # create_invoice_to_pdf(None) liefert laut deinem Code die Bytes (dest='S')
+    pdf_bytes = pdf_gen.create_invoice_to_pdf(None)
+
+    return send_file(
+        io.BytesIO(pdf_bytes),
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f"Rechnung_{order_id}.pdf"
+    )
+
+
+

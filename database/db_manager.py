@@ -179,13 +179,13 @@ class DB_Manager:
                             items.append(Book(*res))
                             continue
 
-                        cursor.execute(Electronic.get_load_query() + " WHERE p.id = %s", (str(product_id),))
+                        cursor.execute(Electronic.get_load_query() + " WHERE p.product_id = %s", (str(product_id),))
                         res = cursor.fetchone()
                         if res:
                             items.append(Electronic(*res))
                             continue
 
-                        cursor.execute(Clothes.get_load_query() + " WHERE p.id = %s", (str(product_id),))
+                        cursor.execute(Clothes.get_load_query() + " WHERE p.product_id = %s", (str(product_id),))
                         res = cursor.fetchone()
                         if res:
                             items.append(Clothes(*res))
@@ -213,3 +213,36 @@ class DB_Manager:
         except psycopg2.Error as e:
             print(f"Fehler beim Hinzufügen zum Warenkorb: {e}")
             return False
+
+    def remove_item_from_cart(self, customer_id, product_id):
+        try:
+            with psycopg2.connect(**self.params) as conn:
+                with conn.cursor() as cursor:
+                    query = """DELETE FROM public.shopping_cart WHERE product_id = %s and customer_id = %s"""
+                    cursor.execute(query, (str(product_id), str(customer_id)))
+                    conn.commit()
+                    print(f"DEBUG: Produkt {product_id} für Kunde {customer_id} entfernt.")
+                    return True
+        except psycopg2.Error as e:
+            print(f"Fehler beim Entfernen aus dem Warenkorb: {e}")
+            return False
+
+    def get_orders_per_customer(self, customer_id):
+        try:
+            with psycopg2.connect(**self.params) as conn:
+                with conn.cursor() as cursor:
+                    # Nutzt deine neue statische Methode im Model
+                    cursor.execute(Shopping_Cart.get_all_orders_per_customer(), (str(customer_id),))
+                    order_ids = [row[0] for row in cursor.fetchall()]
+
+            # Nutzt deine vorhandene Methode, um die JSON-Daten pro ID zu laden
+            orders = []
+            for oid in order_ids:
+                order_data = self.get_invoice_data(oid)
+                if order_data:
+                    orders.append(order_data)
+
+            return orders
+        except psycopg2.Error as e:
+            print(f"Fehler beim Laden der Kundenbestellungen: {e}")
+            return []

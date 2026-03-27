@@ -106,4 +106,7 @@ class Invoice_To_PDF(FPDF):
         self.cell(130, 10, "Gesamtpreis:", 0, 0, 'R')
         self.cell(60, 10, f"{self.invoice_data['total_sum']:.2f} EUR", 1, 1, 'R')
 
-        self.output(file_name)
+        if file_name:
+            self.output(file_name)
+        else:
+            return self.output(dest='S').encode('latin-1')
