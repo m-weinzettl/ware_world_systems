@@ -37,7 +37,7 @@
                         <tr>
                             <td><small class="text-muted">{{ order.order_id }}</small></td>
                             <td>{{ order.customer_info.name or order.customer_info.company_name }}</td>
-                            <td>{{ order.items|length }}</td>
+                            <td>{{ order.items()|length }}</td>
                             <td><strong>{{ "%.2f"|format(order.total_sum) }} €</strong></td>
                             <td class="text-center">
                                 <a href="{{ url_for('cart.download_invoice', order_id=order.order_id) }}"
