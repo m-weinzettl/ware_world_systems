@@ -111,7 +111,7 @@ def checkout():
     from model.customer.private_customer import Private_Customer
     current_customer = Private_Customer(
         customer_id,
-        session.get('user_email', ''),
+        session.get('user_mail', ''),
         "",
         session.get('user_name', 'Kunde'),
         "",
@@ -122,7 +122,6 @@ def checkout():
     for item in cart_items:
         new_cart.add_item(item)
 
-    # Speichert die Order und LÖSCHT danach den Warenkorb in der DB
     order_id = db.save_order(new_cart)
 
     if order_id:
@@ -148,7 +147,6 @@ def download_invoice(order_id):
         return redirect(url_for('user.login'))
 
     db = DB_Manager()
-    # Nutzt deine existierende get_invoice_data Methode
     invoice_data = db.get_invoice_data(order_id)
 
     if not invoice_data:

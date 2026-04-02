@@ -22,6 +22,8 @@ def login():
             session.permanent = True
             session["customer_id"] = str(getattr(user, 'customer_id', getattr(user, 'id', None)))
             session["user_name"] = user.name
+            session["user_email"] = user.mail
+            session["user_address"] = user.address
             session["is_company"] = hasattr(user, "uid") and user.uid is not None
             return redirect(url_for("product.index"))
 
