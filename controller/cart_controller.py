@@ -82,7 +82,7 @@ def show_cart():
     from model.customer.private_customer import Private_Customer
     current_customer = Private_Customer(
         customer_id=customer_id,
-        mail=session.get('user_email', ''),
+        mail=session.get('user_mail', ''),
         tel_number="",
         name=session.get('user_name', 'Kunde'),
         address=session.get('user_address', ''),
