@@ -25,6 +25,9 @@ def login():
             session["user_email"] = user.mail
             session["user_address"] = user.address
             session["is_company"] = hasattr(user, "uid") and user.uid is not None
+            session["uid"] = user.uid
+            session["tel_number"] = user.tel_number
+            session["geb_date"] = user.geb_date
             return redirect(url_for("product.index"))
 
         return render_template("login.html", error="Ungültige Zugangsdaten")
