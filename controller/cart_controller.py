@@ -81,12 +81,12 @@ def show_cart():
     # user_email muss im user_controller gesetzt sein!
     from model.customer.private_customer import Private_Customer
     current_customer = Private_Customer(
-        customer_id,
-        session.get('user_email', 'gast@wareworld.de'),
-        "",
-        session.get('user_name', 'Kunde'),
-        "",
-        ""
+        customer_id=customer_id,
+        mail=session.get('user_email', ''),
+        tel_number="",
+        name=session.get('user_name', 'Kunde'),
+        address=session.get('user_address', ''),
+        geb_date=None
     )
 
     cart = Shopping_Cart(current_customer)
